@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<section class="container form-wrap py-5"><a class="back-link" href="{{ url_for('books.dashboard') }}">← My dashboard</a><div class="form-card mt-3"><p class="eyebrow">SHARE A GOOD READ</p><h1 class="h2">{{ heading }}</h1><p class="text-secondary mb-4">Add a few details so another student can find your book.</p>
+  <form method="post">{{ form.hidden_tag() }}{{ render_field(form.title, placeholder="e.g. The Midnight Library") }}{{ render_field(form.author, placeholder="Author name") }}<div class="row"><div class="col-md-6">{{ render_field(form.category) }}</div><div class="col-md-6">{{ render_field(form.condition) }}</div></div>{{ render_field(form.description, rows=4, placeholder="Share a little about the book or its condition…") }}{{ form.submit(class="btn btn-primary px-4") }} <a class="btn btn-outline-secondary" href="{{ url_for('books.dashboard') }}">Cancel</a></form>
+</div></section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<section class="container py-5">
+  <a class="back-link" href="{{ url_for('books.index') }}">← Back to explore</a>
+  <div class="row g-5 mt-2">
+    <div class="col-md-5 col-lg-4"><div class="detail-cover cover-{{ (book.id - 1) % 6 }}">
+      <div class="cover-placeholder"><span class="cover-category">{{ book.category }}</span><span class="cover-title">{{ book.title }}</span><span class="cover-author">{{ book.author }}</span><span class="cover-ornament" aria-hidden="true">✳</span></div>
+      {% if book.cover_url %}<img class="cover-image" src="{{ book.cover_url }}" alt="Cover of {{ book.title }}" onerror="this.remove()">{% endif %}
+    </div></div>
+    <div class="col-md-7 col-lg-8 detail-copy"><div class="d-flex flex-wrap align-items-center gap-2 mb-3"><span class="badge status-{{ book.exchange_status|lower }}">{{ book.exchange_status }}</span><span class="badge text-bg-light">{{ book.condition }} condition</span></div>
+      <p class="eyebrow">A BOOK FROM YOUR COMMUNITY</p><h1>{{ book.title }}</h1><p class="lead text-secondary">by {{ book.author }}</p>
+      <div class="owner-chip"><span class="owner-avatar">{{ book.owner.name[0]|upper }}</span><span>Listed by <strong>{{ book.owner.name }}</strong></span></div>
+      <hr class="my-4"><h2 class="h5">About this book</h2><p class="text-secondary description">{{ book.description or "No description added yet. Ask the owner for more details about this copy." }}</p>
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        {% if current_user.is_authenticated and book.owner_id == current_user.id %}
+          <a class="btn btn-primary" href="{{ url_for('books.edit', book_id=book.id) }}">Edit listing</a>
+          <form method="post" action="{{ url_for('books.delete', book_id=book.id) }}" onsubmit="return confirm('Delete this listing?');">{{ csrf_field() }}<button class="btn btn-outline-danger" type="submit">Delete listing</button></form>
+        {% elif book.exchange_status == "Available" %}
+          {% if current_user.is_authenticated %}
+            <form method="post" action="{{ url_for('exchanges.request_exchange', book_id=book.id) }}" class="request-form">
+              {{ csrf_field() }}<label for="message" class="form-label fw-semibold">Add a note to {{ book.owner.name }} <span class="text-secondary fw-normal">(optional)</span></label><textarea class="form-control mb-3" id="message" name="message" rows="3" maxlength="1000" placeholder="Tell them why you’d like to read it…"></textarea><button class="btn btn-primary btn-lg" type="submit">Request exchange</button>
+            </form>
+          {% else %}<a class="btn btn-primary btn-lg" href="{{ url_for('auth.login', next=url_for('books.detail', book_id=book.id)) }}">Sign in to request</a>{% endif %}
+        {% else %}<button class="btn btn-secondary btn-lg" disabled>Not available for exchange</button>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

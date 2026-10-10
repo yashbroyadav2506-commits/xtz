@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field %}
+{% block title %}My dashboard{% endblock %}
+{% block content %}
+<section class="container py-5">
+  <div class="dashboard-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">YOUR BOOKSWAP</p><h1 class="section-title">Hey, {{ current_user.name.split()[0] }}.</h1><p class="text-secondary mb-0">Keep your books moving and your requests in one place.</p></div><a class="btn btn-primary" href="{{ url_for('books.create') }}">+ List a book</a></div>
+  <div class="dashboard-grid">
+    <section class="dashboard-panel"><div class="panel-heading"><h2>My listings</h2><span class="count-pill">{{ my_books|length }}</span></div>
+      {% if my_books %}<div class="list-group list-group-flush">{% for book in my_books %}<div class="dashboard-row"><div class="mini-cover cover-{{ (book.id - 1) % 6 }}"><span>{{ book.title[0]|upper }}</span>{% if book.cover_url %}<img src="{{ book.cover_url }}" alt="" loading="lazy" onerror="this.remove()">{% endif %}</div><div class="row-main"><a href="{{ url_for('books.detail', book_id=book.id) }}" class="fw-semibold text-decoration-none">{{ book.title }}</a><span class="small text-secondary">{{ book.author }} · {{ book.condition }}</span></div><span class="badge status-{{ book.exchange_status|lower }}">{{ book.exchange_status }}</span></div>{% endfor %}</div>
+      {% else %}<div class="panel-empty"><p>You haven’t listed a book yet.</p><a href="{{ url_for('books.create') }}">Add your first book →</a></div>{% endif %}
+    </section>
+    <section class="dashboard-panel"><div class="panel-heading"><h2>Incoming requests</h2><span class="count-pill">{{ incoming|length }}</span></div>
+      {% if incoming %}<div class="request-list">{% for exchange in incoming %}<div class="request-card"><div class="d-flex justify-content-between gap-2"><div><a href="{{ url_for('books.detail', book_id=exchange.book.id) }}" class="fw-semibold text-decoration-none">{{ exchange.book.title }}</a><div class="small text-secondary">From {{ exchange.requester.name }}</div></div><span class="badge text-bg-light">{{ exchange.status }}</span></div>{% if exchange.message %}<p class="request-message">“{{ exchange.message }}”</p>{% endif %}{% if exchange.status == "Pending" %}<div class="d-flex gap-2 mt-3"><form method="post" action="{{ url_for('exchanges.update_request', request_id=exchange.id, action='accept') }}">{{ csrf_field() }}<button class="btn btn-sm btn-primary">Accept</button></form><form method="post" action="{{ url_for('exchanges.update_request', request_id=exchange.id, action='decline') }}">{{ csrf_field() }}<button class="btn btn-sm btn-outline-secondary">Decline</button></form></div>{% endif %}</div>{% endfor %}</div>
+      {% else %}<div class="panel-empty"><p>No one has requested a book yet.</p><span>Requests will show up here.</span></div>{% endif %}
+    </section>
+    <section class="dashboard-panel sent-panel"><div class="panel-heading"><h2>Requests I’ve sent</h2><span class="count-pill">{{ sent|length }}</span></div>
+      {% if sent %}<div class="request-list">{% for exchange in sent %}<div class="dashboard-row"><div class="row-main"><a href="{{ url_for('books.detail', book_id=exchange.book.id) }}" class="fw-semibold text-decoration-none">{{ exchange.book.title }}</a><span class="small text-secondary">Owner: {{ exchange.book.owner.name }}</span></div><span class="badge text-bg-light">{{ exchange.status }}</span>{% if exchange.status == "Pending" %}<form method="post" action="{{ url_for('exchanges.update_request', request_id=exchange.id, action='cancel') }}">{{ csrf_field() }}<button class="btn btn-sm btn-outline-secondary">Cancel</button></form>{% endif %}</div>{% endfor %}</div>
+      {% else %}<div class="panel-empty"><p>You haven’t requested an exchange.</p><a href="{{ url_for('books.index') }}">Explore books →</a></div>{% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}

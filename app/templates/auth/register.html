@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Join BookSwap{% endblock %}
+{% block content %}
+<section class="container auth-wrap"><div class="auth-card">
+  <p class="eyebrow">YOUR NEXT CHAPTER</p><h1 class="h2 mb-2">Join the book-sharing community.</h1><p class="text-secondary mb-4">One small swap can start a whole new story.</p>
+  <form method="post">{{ form.hidden_tag() }}{{ render_field(form.name, autocomplete="name") }}{{ render_field(form.email, autocomplete="email") }}{{ render_field(form.password, autocomplete="new-password") }}<p class="form-text mt-n2">Use at least 8 characters.</p>{{ form.submit(class="btn btn-primary w-100 py-2") }}</form>
+  <p class="text-center mt-4 mb-0">Already a member? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+</div></section>
+{% endblock %}

@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Page not found{% endblock %}
+{% block content %}<section class="container error-state"><p class="eyebrow">404 · LOST IN THE STACKS</p><h1>This page isn’t on our shelf.</h1><p class="text-secondary">The link may be out of date, or the page may have moved.</p><a class="btn btn-primary" href="{{ url_for('books.index') }}">Explore books</a></section>{% endblock %}

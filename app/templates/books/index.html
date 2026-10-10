@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Explore books{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-inner">
+    <div><p class="eyebrow text-white-50">A GOOD BOOK GOES A LONG WAY</p><h1>Find your next<br><span>favorite read.</span></h1><p class="lead">Swap books with students on your campus. Pass a story on.</p><a class="btn btn-light btn-lg mt-2" href="#book-results">Explore the shelf <span aria-hidden="true">↓</span></a></div>
+    <div class="hero-art" aria-hidden="true"><div class="book-stack"><span></span><span></span><span></span><span></span></div><div class="orbit">↗</div></div>
+  </div>
+</section>
+<section class="container py-5" id="book-results">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">THE COMMUNITY SHELF</p><h2 class="section-title mb-0">Books worth passing on</h2></div><span class="text-secondary">{{ books.total }} {{ "book" if books.total == 1 else "books" }} listed</span></div>
+  <form method="get" class="filter-panel mb-4">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-lg-4"><label class="form-label small fw-semibold" for="q">Search title or author</label><input id="q" name="q" class="form-control" placeholder="Try “The Alchemist”" value="{{ filters.q }}"></div>
+      <div class="col-6 col-lg-2"><label class="form-label small fw-semibold" for="category">Category</label><select id="category" name="category" class="form-select"><option value="">All categories</option>{% for item in categories %}<option value="{{ item }}" {% if filters.category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-6 col-lg-2"><label class="form-label small fw-semibold" for="condition">Condition</label><select id="condition" name="condition" class="form-select"><option value="">Any condition</option>{% for item in conditions %}<option value="{{ item }}" {% if filters.condition == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-6 col-lg-2"><label class="form-label small fw-semibold" for="status">Status</label><select id="status" name="status" class="form-select"><option value="">Any status</option>{% for item in ["Available", "Requested", "Exchanged"] %}<option value="{{ item }}" {% if filters.status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-6 col-lg-2"><label class="form-label small fw-semibold" for="sort">Sort by</label><select id="sort" name="sort" class="form-select"><option value="newest" {% if filters.sort == "newest" %}selected{% endif %}>Newest</option><option value="title" {% if filters.sort == "title" %}selected{% endif %}>Title A–Z</option></select></div>
+      <div class="col-12 d-flex gap-2 pt-1"><button class="btn btn-primary px-4">Apply filters</button><a href="{{ url_for('books.index') }}" class="btn btn-outline-secondary">Clear</a></div>
+    </div>
+  </form>
+  {% if books.items %}
+  <div class="row g-4">
+    {% for book in books.items %}
+    <div class="col-sm-6 col-xl-4"><article class="book-card h-100">
+      <div class="book-cover cover-{{ (book.id - 1) % 6 }}">
+        <div class="cover-placeholder"><span class="cover-category">{{ book.category }}</span><span class="cover-title">{{ book.title }}</span><span class="cover-author">{{ book.author }}</span><span class="cover-ornament" aria-hidden="true">✳</span></div>
+        {% if book.cover_url %}<img class="cover-image" src="{{ book.cover_url }}" alt="Cover of {{ book.title }}" loading="lazy" onerror="this.remove()">{% endif %}
+      </div>
+      <div class="book-card-body"><div class="d-flex justify-content-between align-items-start gap-2"><h3 class="h5 mb-1"><a class="stretched-link text-decoration-none book-title" href="{{ url_for('books.detail', book_id=book.id) }}">{{ book.title }}</a></h3><span class="badge status-{{ book.exchange_status|lower }}">{{ book.exchange_status }}</span></div><p class="text-secondary mb-3">by {{ book.author }}</p><div class="book-meta"><span>{{ book.condition }}</span><span>Listed by {{ book.owner.name }}</span></div></div>
+    </article></div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">⌕</div><h3>No books found</h3><p class="text-secondary">Try changing your search or filters, or be the first to add a book.</p><a class="btn btn-primary" href="{{ url_for('books.create') }}">List a book</a></div>
+  {% endif %}
+  {% if books.pages > 1 %}<nav class="mt-5" aria-label="Book pages"><ul class="pagination justify-content-center">
+    <li class="page-item {% if not books.has_prev %}disabled{% endif %}"><a class="page-link" href="{{ url_for('books.index', page=books.prev_num, **pagination_args) if books.has_prev else '#' }}">Previous</a></li>
+    {% for page_num in books.iter_pages() %}{% if page_num %}<li class="page-item {% if page_num == books.page %}active{% endif %}"><a class="page-link" href="{{ url_for('books.index', page=page_num, **pagination_args) }}">{{ page_num }}</a></li>{% else %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}{% endfor %}
+    <li class="page-item {% if not books.has_next %}disabled{% endif %}"><a class="page-link" href="{{ url_for('books.index', page=books.next_num, **pagination_args) if books.has_next else '#' }}">Next</a></li>
+  </ul></nav>{% endif %}
+</section>
+{% endblock %}

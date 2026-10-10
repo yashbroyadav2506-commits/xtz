@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Something went wrong{% endblock %}
+{% block content %}<section class="container error-state"><p class="eyebrow">500 · A PLOT TWIST</p><h1>Something went wrong.</h1><p class="text-secondary">We couldn’t load this page right now. Please try again in a moment.</p><a class="btn btn-primary" href="{{ url_for('books.index') }}">Return to BookSwap</a></section>{% endblock %}
