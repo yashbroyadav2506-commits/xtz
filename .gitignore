@@ -12,3 +12,6 @@ instance/
 *.sqlite3
 .idea/
 .vscode/
+.vercel/
+.vercel
+.env*

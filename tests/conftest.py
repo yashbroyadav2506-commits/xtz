@@ -14,6 +14,7 @@ def app(tmp_path):
         SQLALCHEMY_TRACK_MODIFICATIONS = False
         WTF_CSRF_ENABLED = False
         ITEMS_PER_PAGE = 12
+        SESSION_COOKIE_SECURE = False
 
     app = create_app(TestConfig)
     with app.app_context():

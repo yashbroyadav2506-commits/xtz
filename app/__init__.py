@@ -6,7 +6,12 @@ from app.extensions import csrf, db, login_manager, migrate
 
 
 def create_app(config_class=Config):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(
+        __name__,
+        instance_relative_config=True,
+        static_folder="../public",
+        static_url_path="",
+    )
     app.config.from_object(config_class)
 
     db.init_app(app)
